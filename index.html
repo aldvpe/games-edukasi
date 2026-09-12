@@ -3,50 +3,128 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Game Edukasi Kuis - Google Sheets</title>
+  <title>EduQuest 2D & 3D - Game Edukasi Terintegrasi Google Sheets</title>
+  
+  <!-- Google Fonts & Font Awesome Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- File CSS Terpisah -->
   <link rel="stylesheet" href="style.css">
+  
+  <!-- Three.js CDN untuk Rendering 3D -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- Canvas Confetti CDN untuk Efek Poin -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
 <body>
 
-  <div class="game-card">
-    <!-- Layar Loading -->
-    <div id="loading-screen" class="loader">
-      Memuat soal dari Google Sheets...
+  <!-- HEADER -->
+  <header>
+    <div class="logo">
+      <i class="fa-solid fa-gamepad" style="color: var(--primary-red);"></i>
+      EDU<span>QUEST</span>
+    </div>
+    <div class="nav-tabs">
+      <button class="tab-btn active" onclick="switchMode('2d')">Mode 2D (Math Runner)</button>
+      <button class="tab-btn" onclick="switchMode('3d')">Mode 3D (Object Explorer)</button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <div class="container">
+    
+    <!-- CONFIG GOOGLE APP SCRIPT -->
+    <div class="config-box">
+      <p style="font-size: 0.85rem; margin-bottom: 6px; color: var(--text-muted);">
+        <i class="fa-solid fa-link"></i> Endpoint Google Apps Script (Leaderboard & Soal):
+      </p>
+      <input type="text" id="endpointUrl" placeholder="https://script.google.com/macros/s/.../exec">
+      <button class="btn" onclick="saveEndpoint()">Hubungkan</button>
     </div>
 
-    <!-- Layar Input Nama -->
-    <div id="start-screen" class="hidden">
-      <h1>Game Kuis Edukasi</h1>
-      <p>Masukkan nama kamu untuk memulai:</p>
-      <input type="text" id="player-name" placeholder="Nama Lengkap" required>
-      <button class="btn-submit" onclick="startGame()">Mulai Bermain</button>
-    </div>
+    <!-- VIEWPORT GAME -->
+    <div class="game-viewport" id="gameViewport">
+      
+      <!-- FLOATING SCORE TEXT CONTAINER -->
+      <div id="floatingTextContainer"></div>
 
-    <!-- Layar Permainan -->
-    <div id="game-screen" class="hidden">
-      <div class="status-bar">
-        <span>Soal: <span id="current-question-num">1</span>/<span id="total-questions">0</span></span>
-        <span>Skor: <span id="score">0</span></span>
+      <!-- HUD OVERLAY -->
+      <div class="game-ui">
+        <div class="hud-card" id="scoreCard"><i class="fa-solid fa-trophy" style="color: gold;"></i> Skor: <span id="scoreVal">0</span></div>
+        <div class="hud-card"><i class="fa-solid fa-user"></i> <span id="playerDisplay">Pemain</span></div>
       </div>
-      <div id="question" class="question-box">Memuat soal...</div>
-      <div class="options-grid">
-        <button class="btn-option" onclick="checkAnswer('A')" id="opt-A">A</button>
-        <button class="btn-option" onclick="checkAnswer('B')" id="opt-B">B</button>
-        <button class="btn-option" onclick="checkAnswer('C')" id="opt-C">C</button>
-        <button class="btn-option" onclick="checkAnswer('D')" id="opt-D">D</button>
+
+      <!-- CANVAS 2D GAME -->
+      <canvas id="canvas2D"></canvas>
+
+      <!-- CANVAS 3D GAME -->
+      <div id="canvas3D" class="hidden"></div>
+
+      <!-- KUIS OVERLAY (POPUP JAWABAN) -->
+      <div id="quizModal" class="question-modal hidden">
+        <h4 style="color: var(--primary-red); font-size: 0.85rem; text-transform: uppercase;">Tantangan Edukasi</h4>
+        <h3 id="questionText">Berapakah 12 x 12?</h3>
+        <div class="options-grid" id="optionsContainer">
+          <!-- Tombol Pilihan Jawaban Dibuat secara Dinamis -->
+        </div>
       </div>
+
+      <!-- GAME OVER OVERLAY -->
+      <div id="gameOverModal" class="question-modal game-over-modal hidden">
+        <div class="game-over-icon"><i class="fa-solid fa-skull-crossbones"></i></div>
+        <h2 style="color: var(--primary-red); font-size: 1.8rem; margin-bottom: 5px;">GAME OVER</h2>
+        <p style="color: #ccc; font-size: 0.9rem; margin-bottom: 1rem;">Jawaban Anda salah! Perjalanan berhenti di sini.</p>
+        <div class="final-score-box">
+          SKOR AKHIR: <span id="finalScoreVal">0</span>
+        </div>
+        <p style="font-size: 0.75rem; color: #aaa; margin-top: 10px;" id="gsStatusText">Skor otomatis tersimpan ke Google Sheets...</p>
+        <button class="btn btn-restart" onclick="restartGame()">
+          <i class="fa-solid fa-rotate-right"></i> Main Lagi
+        </button>
+      </div>
+
+      <!-- START OVERLAY -->
+      <div id="startOverlay" class="question-modal">
+        <h3>Selamat Datang di EduQuest!</h3>
+        <p style="font-size: 0.9rem; color: #ccc; margin-bottom: 1rem;">Masukkan nama Anda untuk mencatat skor ke Google Sheets:</p>
+        <input type="text" id="playerName" placeholder="Nama Siswa..." style="width: 80%; padding: 8px; margin-bottom: 1rem; border-radius: 4px; border: 1px solid #444; background: #222; color: #fff;">
+        <br>
+        <button class="btn" onclick="startGame()">Mulai Game</button>
+      </div>
+
     </div>
 
-    <!-- Layar Hasil -->
-    <div id="end-screen" class="hidden">
-      <h1>Permainan Selesai!</h1>
-      <p>Skor Akhir Kamu:</p>
-      <h2 id="final-score" class="final-score-text">0</h2>
-      <p id="save-status">Menyimpan skor ke Google Sheets...</p>
-      <button class="btn-submit" onclick="location.reload()">Main Lagi</button>
+    <!-- LEADERBOARD / SKOR PERINGKAT -->
+    <div class="leaderboard-card">
+      <h3 style="display: flex; justify-content: space-between; align-items: center;">
+        <span><i class="fa-solid fa-ranking-star" style="color: var(--primary-red);"></i> Papan Peringkat (Google Sheets)</span>
+        <button class="btn" style="padding: 4px 10px; font-size: 0.8rem;" onclick="loadLeaderboard()"><i class="fa-solid fa-rotate"></i> Sync</button>
+      </h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Posisi</th>
+            <th>Nama Pemain</th>
+            <th>Skor</th>
+            <th>Tanggal</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboardBody">
+          <tr>
+            <td colspan="4" style="text-align: center; color: var(--text-muted);">Belum ada data skor tersimpan.</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
+
   </div>
 
+  <footer>
+    &copy; 2026 EduQuest - Game Edukasi 2D & 3D Terintegrasi Google Sheets
+  </footer>
+
+  <!-- File Javascript Terpisah -->
   <script src="script.js"></script>
 </body>
 </html>
