@@ -14,6 +14,8 @@
   
   <!-- Three.js CDN untuk Rendering 3D -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- Canvas Confetti CDN untuk Efek Poin -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
 <body>
 
@@ -42,11 +44,14 @@
     </div>
 
     <!-- VIEWPORT GAME -->
-    <div class="game-viewport">
+    <div class="game-viewport" id="gameViewport">
       
+      <!-- FLOATING SCORE TEXT CONTAINER -->
+      <div id="floatingTextContainer"></div>
+
       <!-- HUD OVERLAY -->
       <div class="game-ui">
-        <div class="hud-card"><i class="fa-solid fa-trophy" style="color: gold;"></i> Skor: <span id="scoreVal">0</span></div>
+        <div class="hud-card" id="scoreCard"><i class="fa-solid fa-trophy" style="color: gold;"></i> Skor: <span id="scoreVal">0</span></div>
         <div class="hud-card"><i class="fa-solid fa-user"></i> <span id="playerDisplay">Pemain</span></div>
       </div>
 
@@ -63,6 +68,20 @@
         <div class="options-grid" id="optionsContainer">
           <!-- Tombol Pilihan Jawaban Dibuat secara Dinamis -->
         </div>
+      </div>
+
+      <!-- GAME OVER OVERLAY -->
+      <div id="gameOverModal" class="question-modal game-over-modal hidden">
+        <div class="game-over-icon"><i class="fa-solid fa-skull-crossbones"></i></div>
+        <h2 style="color: var(--primary-red); font-size: 1.8rem; margin-bottom: 5px;">GAME OVER</h2>
+        <p style="color: #ccc; font-size: 0.9rem; margin-bottom: 1rem;">Jawaban Anda salah! Perjalanan berhenti di sini.</p>
+        <div class="final-score-box">
+          SKOR AKHIR: <span id="finalScoreVal">0</span>
+        </div>
+        <p style="font-size: 0.75rem; color: #aaa; margin-top: 10px;" id="gsStatusText">Skor otomatis tersimpan ke Google Sheets...</p>
+        <button class="btn btn-restart" onclick="restartGame()">
+          <i class="fa-solid fa-rotate-right"></i> Main Lagi
+        </button>
       </div>
 
       <!-- START OVERLAY -->
