@@ -6,6 +6,13 @@ let currentQuestionIndex = 0;
 let score = 0;
 let playerName = "";
 
+// Mencegah browser scroll ke bawah saat menekan tombol Space di luar input teks
+window.addEventListener('keydown', function(e) {
+  if ((e.code === 'Space' || e.key === ' ') && e.target.tagName !== 'INPUT') {
+    e.preventDefault();
+  }
+});
+
 // Ambil data soal dari Google Sheets saat halaman di-load
 async function fetchQuestions() {
   try {
