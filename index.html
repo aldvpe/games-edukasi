@@ -3,31 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EduQuest 2D & 3D - Game Edukasi Terintegrasi Google Sheets</title>
+  <title>EduQuest Ultra - 2D & 3D Interactive Learning Game</title>
   
   <!-- Google Fonts & Font Awesome Icons -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <!-- File CSS Terpisah -->
+  <!-- CSS Utama -->
   <link rel="stylesheet" href="style.css">
   
   <!-- Three.js CDN untuk Rendering 3D -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <!-- Canvas Confetti CDN untuk Efek Poin -->
+  <!-- Canvas Confetti CDN -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
 <body>
 
-  <!-- HEADER -->
+  <!-- HEADER NAVBAR -->
   <header>
     <div class="logo">
-      <i class="fa-solid fa-gamepad" style="color: var(--primary-red);"></i>
-      EDU<span>QUEST</span>
+      <i class="fa-solid fa-rocket logo-icon"></i>
+      EDU<span>QUEST</span> <small class="badge-v2">ULTRA 3D</small>
     </div>
     <div class="nav-tabs">
-      <button class="tab-btn active" onclick="switchMode('2d')">Mode 2D (Math Runner)</button>
-      <button class="tab-btn" onclick="switchMode('3d')">Mode 3D (Object Explorer)</button>
+      <button class="tab-btn active" onclick="switchMode('2d')">
+        <i class="fa-solid fa-gamepad"></i> 2D Cyber-Runner
+      </button>
+      <button class="tab-btn" onclick="switchMode('3d')">
+        <i class="fa-solid fa-cubes"></i> 3D Galaxy Explorer
+      </button>
     </div>
   </header>
 
@@ -36,23 +40,44 @@
     
     <!-- CONFIG GOOGLE APP SCRIPT -->
     <div class="config-box">
-      <p style="font-size: 0.85rem; margin-bottom: 6px; color: var(--text-muted);">
-        <i class="fa-solid fa-link"></i> Endpoint Google Apps Script (Leaderboard & Soal):
-      </p>
-      <input type="text" id="endpointUrl" placeholder="https://script.google.com/macros/s/.../exec">
-      <button class="btn" onclick="saveEndpoint()">Hubungkan</button>
+      <div class="config-title">
+        <i class="fa-solid fa-cloud-bolt"></i> Google Sheets Cloud Sync
+      </div>
+      <div class="config-inputs">
+        <input type="text" id="endpointUrl" placeholder="Tempel URL Web App Google Apps Script di sini...">
+        <button class="btn btn-glow" onclick="saveEndpoint()">
+          <i class="fa-solid fa-plug"></i> Hubungkan
+        </button>
+      </div>
     </div>
 
     <!-- VIEWPORT GAME -->
     <div class="game-viewport" id="gameViewport">
       
-      <!-- FLOATING SCORE TEXT CONTAINER -->
+      <!-- FLOATING TEXT CONTAINER -->
       <div id="floatingTextContainer"></div>
 
-      <!-- HUD OVERLAY -->
+      <!-- HUD OVERLAY TOP -->
       <div class="game-ui">
-        <div class="hud-card" id="scoreCard"><i class="fa-solid fa-trophy" style="color: gold;"></i> Skor: <span id="scoreVal">0</span></div>
-        <div class="hud-card"><i class="fa-solid fa-user"></i> <span id="playerDisplay">Pemain</span></div>
+        <div class="hud-group">
+          <div class="hud-card" id="scoreCard">
+            <i class="fa-solid fa-trophy hud-icon-gold"></i>
+            <span>SKOR: <strong id="scoreVal">0</strong></span>
+          </div>
+          <div class="hud-card" id="streakCard">
+            <i class="fa-solid fa-fire hud-icon-fire"></i>
+            <span>COMBO: <strong id="streakVal">x0</strong></span>
+          </div>
+        </div>
+        <div class="hud-card player-card">
+          <i class="fa-solid fa-user-astronaut"></i>
+          <span id="playerDisplay">Pemain</span>
+        </div>
+      </div>
+
+      <!-- CONTROLS HINT OVERLAY -->
+      <div class="controls-hint" id="controlsHint">
+        <span id="hintText">Tekan <strong>[ SPASI ]</strong> untuk Melompat & Ambil Orb Kuis!</span>
       </div>
 
       <!-- CANVAS 2D GAME -->
@@ -61,10 +86,10 @@
       <!-- CANVAS 3D GAME -->
       <div id="canvas3D" class="hidden"></div>
 
-      <!-- KUIS OVERLAY (POPUP JAWABAN) -->
+      <!-- KUIS OVERLAY (POPUP JAWABAN GLASSMORPHISM) -->
       <div id="quizModal" class="question-modal hidden">
-        <h4 style="color: var(--primary-red); font-size: 0.85rem; text-transform: uppercase;">Tantangan Edukasi</h4>
-        <h3 id="questionText">Berapakah 12 x 12?</h3>
+        <div class="quiz-badge"><i class="fa-solid fa-brain"></i> TANTANGAN EDUKASI</div>
+        <h3 id="questionText">Berapakah hasil dari 12 x 12?</h3>
         <div class="options-grid" id="optionsContainer">
           <!-- Tombol Pilihan Jawaban Dibuat secara Dinamis -->
         </div>
@@ -73,58 +98,68 @@
       <!-- GAME OVER OVERLAY -->
       <div id="gameOverModal" class="question-modal game-over-modal hidden">
         <div class="game-over-icon"><i class="fa-solid fa-skull-crossbones"></i></div>
-        <h2 style="color: var(--primary-red); font-size: 1.8rem; margin-bottom: 5px;">GAME OVER</h2>
-        <p style="color: #ccc; font-size: 0.9rem; margin-bottom: 1rem;">Jawaban Anda salah! Perjalanan berhenti di sini.</p>
+        <h2 class="neon-title-red">GAME OVER</h2>
+        <p class="modal-sub">Jawaban Anda kurang tepat! Tetap semangat dan coba lagi.</p>
         <div class="final-score-box">
           SKOR AKHIR: <span id="finalScoreVal">0</span>
         </div>
-        <p style="font-size: 0.75rem; color: #aaa; margin-top: 10px;" id="gsStatusText">Skor otomatis tersimpan ke Google Sheets...</p>
+        <p class="gs-status" id="gsStatusText"><i class="fa-solid fa-sync fa-spin"></i> Menyimpan ke Google Sheets...</p>
         <button class="btn btn-restart" onclick="restartGame()">
-          <i class="fa-solid fa-rotate-right"></i> Main Lagi
+          <i class="fa-solid fa-rotate-right"></i> MAIN LAGI
         </button>
       </div>
 
       <!-- START OVERLAY -->
-      <div id="startOverlay" class="question-modal">
-        <h3>Selamat Datang di EduQuest!</h3>
-        <p style="font-size: 0.9rem; color: #ccc; margin-bottom: 1rem;">Masukkan nama Anda untuk mencatat skor ke Google Sheets:</p>
-        <input type="text" id="playerName" placeholder="Nama Siswa..." style="width: 80%; padding: 8px; margin-bottom: 1rem; border-radius: 4px; border: 1px solid #444; background: #222; color: #fff;">
-        <br>
-        <button class="btn" onclick="startGame()">Mulai Game</button>
+      <div id="startOverlay" class="question-modal start-modal">
+        <div class="start-hero-icon"><i class="fa-solid fa-gamepad"></i></div>
+        <h2>SIAP UNTUK PETUALANGAN?</h2>
+        <p class="modal-sub">Jelajahi dunia 2D & 3D, jawab tantangan edukasi, dan raih posisi puncak di Papan Peringkat!</p>
+        <div class="input-group">
+          <i class="fa-solid fa-user"></i>
+          <input type="text" id="playerName" placeholder="Masukkan Nama Siswa...">
+        </div>
+        <button class="btn btn-start" onclick="startGame()">
+          <i class="fa-solid fa-play"></i> MULAI GAME
+        </button>
       </div>
 
     </div>
 
-    <!-- LEADERBOARD / SKOR PERINGKAT -->
+    <!-- LEADERBOARD CARD -->
     <div class="leaderboard-card">
-      <h3 style="display: flex; justify-content: space-between; align-items: center;">
-        <span><i class="fa-solid fa-ranking-star" style="color: var(--primary-red);"></i> Papan Peringkat (Google Sheets)</span>
-        <button class="btn" style="padding: 4px 10px; font-size: 0.8rem;" onclick="loadLeaderboard()"><i class="fa-solid fa-rotate"></i> Sync</button>
-      </h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Posisi</th>
-            <th>Nama Pemain</th>
-            <th>Skor</th>
-            <th>Tanggal</th>
-          </tr>
-        </thead>
-        <tbody id="leaderboardBody">
-          <tr>
-            <td colspan="4" style="text-align: center; color: var(--text-muted);">Belum ada data skor tersimpan.</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="leaderboard-header">
+        <h3><i class="fa-solid fa-ranking-star"></i> Papan Peringkat Global (Google Sheets)</h3>
+        <button class="btn btn-sm" onclick="loadLeaderboard()">
+          <i class="fa-solid fa-arrows-rotate"></i> Sync Data
+        </button>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Peringkat</th>
+              <th>Nama Pemain</th>
+              <th>Skor Akhir</th>
+              <th>Waktu</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboardBody">
+            <tr>
+              <td colspan="4" class="empty-table">Belum ada data skor tersimpan. Hubungkan Google Apps Script untuk sync!</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
   </div>
 
+  <!-- FOOTER -->
   <footer>
-    &copy; 2026 EduQuest - Game Edukasi 2D & 3D Terintegrasi Google Sheets
+    <p>&copy; 2026 EduQuest Ultra - Platform Game Edukasi 2D & 3D Interaktif</p>
   </footer>
 
-  <!-- File Javascript Terpisah -->
+  <!-- File Javascript Utama -->
   <script src="script.js"></script>
 </body>
 </html>
