@@ -1,5 +1,5 @@
 // --- STATE UTAMA GAME ---
-let currentMode = '2d'; // '2d' atau '3d'
+let currentMode = '2d'; 
 let score = 0;
 let playerName = "Pemain";
 let isGameRunning = false;
@@ -10,7 +10,8 @@ let questions = [
   { q: "Berapa hasil dari 15 + 27?", options: ["42", "32", "52", "45"], ans: 0 },
   { q: "Planet terdekat dari Matahari adalah?", options: ["Venus", "Mars", "Merkurius", "Bumi"], ans: 2 },
   { q: "Simbol kimia untuk Air adalah?", options: ["CO2", "H2O", "O2", "NaCl"], ans: 1 },
-  { q: "Berapa hasil dari 9 x 8?", options: ["64", "72", "81", "56"], ans: 1 }
+  { q: "Berapa hasil dari 9 x 8?", options: ["64", "72", "81", "56"], ans: 1 },
+  { q: "Ibu kota dari Indonesia saat ini adalah?", options: ["Bandung", "Surabaya", "Jakarta", "Medan"], ans: 2 }
 ];
 let currentQIndex = 0;
 
@@ -35,6 +36,9 @@ function saveEndpoint() {
 
 async function sendScoreToGS(finalScore) {
   if (!endpoint) return;
+  const statusEl = document.getElementById('gsStatusText');
+  if (statusEl) statusEl.innerText = "Mengirim skor ke Google Sheets...";
+  
   try {
     await fetch(endpoint, {
       method: 'POST',
@@ -46,9 +50,11 @@ async function sendScoreToGS(finalScore) {
         score: finalScore
       })
     });
+    if (statusEl) statusEl.innerText = "✓ Skor berhasil tersimpan di Google Sheets!";
     setTimeout(loadLeaderboard, 1500);
   } catch (err) {
     console.error("Gagal mengirim skor:", err);
+    if (statusEl) statusEl.innerText = "✗ Gagal terhubung ke Google Sheets.";
   }
 }
 
@@ -82,9 +88,25 @@ function startGame() {
   if (input) playerName = input;
   document.getElementById('playerDisplay').innerText = playerName;
   document.getElementById('startOverlay').classList.add('hidden');
+  document.getElementById('gameOverModal').classList.add('hidden');
+  
   score = 0;
   document.getElementById('scoreVal').innerText = score;
   isGameRunning = true;
+}
+
+function restartGame() {
+  document.getElementById('gameOverModal').classList.add('hidden');
+  resetPositions();
+  score = 0;
+  document.getElementById('scoreVal').innerText = score;
+  isGameRunning = true;
+}
+
+function resetPositions() {
+  player2D.y = 300;
+  player2D.dy = 0;
+  target2D.x = 600;
 }
 
 function switchMode(mode) {
@@ -123,17 +145,62 @@ function triggerQuiz() {
 
 function answerQuiz(isCorrect) {
   document.getElementById('quizModal').classList.add('hidden');
-  if (isCorrect) {
-    score += 50;
-    alert("Jawaban Benar! +50 Skor");
-  } else {
-    alert("Jawaban Salah! Tetap semangat.");
-  }
-  document.getElementById('scoreVal').innerText = score;
   
-  currentQIndex = (currentQIndex + 1) % questions.length;
+  if (isCorrect) {
+    // --- AKSI JIKA JAWABAN BENAR ---
+    score += 50;
+    document.getElementById('scoreVal').innerText = score;
+    
+    // 1. Efek Confetti (Kembang Api)
+    if (typeof confetti === 'function') {
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    }
+
+    // 2. Animasi Floating Text "+50 SCORE!"
+    showFloatingText("+50 SCORE!");
+
+    // 3. Animasi Glow pada Kartu Skor HUD
+    const card = document.getElementById('scoreCard');
+    card.classList.add('score-glow');
+    setTimeout(() => card.classList.remove('score-glow'), 600);
+
+    // Lanjut Pertanyaan Berikutnya
+    currentQIndex = (currentQIndex + 1) % questions.length;
+    isGameRunning = true;
+
+  } else {
+    // --- AKSI JIKA JAWABAN SALAH (GAME OVER) ---
+    showGameOver();
+  }
+}
+
+// Efek Floating Text saat Poin Ditambahkan
+function showFloatingText(text) {
+  const container = document.getElementById('floatingTextContainer');
+  const el = document.createElement('div');
+  el.className = 'floating-text';
+  el.innerText = text;
+  
+  // Posisi acak sedikit di tengah layar
+  el.style.left = '40%';
+  el.style.top = '45%';
+  
+  container.appendChild(el);
+  setTimeout(() => el.remove(), 1200);
+}
+
+// Tampilan Game Over
+function showGameOver() {
+  isGameRunning = false;
+  document.getElementById('finalScoreVal').innerText = score;
+  document.getElementById('gameOverModal').classList.remove('hidden');
+  
+  // Simpan Skor Akhir ke Google Sheets
   sendScoreToGS(score);
-  isGameRunning = true;
 }
 
 // --- LOGIKA GAME 2D (CANVAS RUNNER) ---
