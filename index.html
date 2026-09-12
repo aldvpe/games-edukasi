@@ -19,7 +19,7 @@
       <h1>Game Kuis Edukasi</h1>
       <p>Masukkan nama kamu untuk memulai:</p>
       <input type="text" id="player-name" placeholder="Nama Lengkap" required>
-      <button class="btn-submit" id="btn-start">Mulai Bermain</button>
+      <button class="btn-submit" onclick="startGame()">Mulai Bermain</button>
     </div>
 
     <!-- Layar Permainan -->
@@ -30,10 +30,10 @@
       </div>
       <div id="question" class="question-box">Memuat soal...</div>
       <div class="options-grid">
-        <button class="btn-option" data-option="A" id="opt-A">A</button>
-        <button class="btn-option" data-option="B" id="opt-B">B</button>
-        <button class="btn-option" data-option="C" id="opt-C">C</button>
-        <button class="btn-option" data-option="D" id="opt-D">D</button>
+        <button class="btn-option" onclick="checkAnswer('A')" id="opt-A">A</button>
+        <button class="btn-option" onclick="checkAnswer('B')" id="opt-B">B</button>
+        <button class="btn-option" onclick="checkAnswer('C')" id="opt-C">C</button>
+        <button class="btn-option" onclick="checkAnswer('D')" id="opt-D">D</button>
       </div>
     </div>
 
@@ -41,9 +41,9 @@
     <div id="end-screen" class="hidden">
       <h1>Permainan Selesai!</h1>
       <p>Skor Akhir Kamu:</p>
-      <h2 id="final-score" class="score-display">0</h2>
+      <h2 id="final-score" class="final-score-text">0</h2>
       <p id="save-status">Menyimpan skor ke Google Sheets...</p>
-      <button class="btn-submit" id="btn-restart">Main Lagi</button>
+      <button class="btn-submit" onclick="location.reload()">Main Lagi</button>
     </div>
   </div>
 
