@@ -1,167 +1,336 @@
-// GANTI DENGAN URL GOOGLE APPS SCRIPT ANDA
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx.../exec";
+const URL_GOOGLE_SCRIPT =
+    "MASUKKAN_URL_GOOGLE_APPS_SCRIPT_DI_SINI";
 
-// Status Game
-let playerName = "";
-let score = 0;
-let currentQuestionIndex = 0;
-let questions = [];
 
-// Canvas 2D Setup
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
+let soal = [];
+let soalSekarang = 0;
+let skor = 0;
+let namaPemain = "";
 
-// Objek Karakter 2D Sederhana
-const player2D = {
-  x: 50,
-  y: 130,
-  width: 30,
-  height: 40,
-  color: "#e94560",
-  speed: 2
-};
 
-// Data Cadangan (Fallback) jika URL Google Sheet belum terpasang
-const fallbackQuestions = [
-  {
-    pertanyaan: "Berapakah hasil dari 12 x 5?",
-    pilihan: ["50", "60", "70", "55"],
-    jawabanBenar: "60"
-  },
-  {
-    pertanyaan: "Planet manakah yang paling dekat dengan Matahari?",
-    pilihan: ["Venus", "Bumi", "Merkurius", "Mars"],
-    jawabanBenar: "Merkurius"
-  }
-];
+// ===============================
+// MULAI GAME
+// ===============================
 
-// 1. Memulai Permainan
-async function startGame() {
-  const inputName = document.getElementById("player-name").value.trim();
-  if (!inputName) {
-    alert("Silakan masukkan nama terlebih dahulu!");
-    return;
-  }
-  
-  playerName = inputName;
-  document.getElementById("display-name").innerText = playerName;
-  
-  switchScreen("start-screen", "game-screen");
-  drawPlayer();
-  
-  // Mengambil Data Soal dari Google Sheets
-  await loadQuestionsFromSheet();
-  displayQuestion();
-}
+async function mulaiGame() {
 
-// 2. Fetch Data Soal dari Google Sheets API
-async function loadQuestionsFromSheet() {
-  try {
-    const response = await fetch(GOOGLE_SCRIPT_URL);
-    if (!response.ok) throw new Error("Gagal terhubung ke Apps Script");
-    const data = await response.json();
-    if (data && data.length > 0) {
-      questions = data;
-    } else {
-      questions = fallbackQuestions;
+    const inputNama =
+        document.getElementById("nama");
+
+    namaPemain =
+        inputNama.value.trim();
+
+    if (!namaPemain) {
+
+        alert("Masukkan nama terlebih dahulu!");
+
+        return;
     }
-  } catch (error) {
-    console.warn("Menggunakan data soal lokal (Google Sheet tidak terjangkau):", error);
-    questions = fallbackQuestions;
-  }
+
+
+    document
+        .getElementById("startScreen")
+        .classList.add("hidden");
+
+    document
+        .getElementById("quizScreen")
+        .classList.remove("hidden");
+
+
+    await ambilSoal();
 }
 
-// 3. Menampilkan Soal Ke Layar
-function displayQuestion() {
-  if (currentQuestionIndex >= questions.length) {
-    endGame();
-    return;
-  }
 
-  const q = questions[currentQuestionIndex];
-  document.getElementById("question-text").innerText = q.pertanyaan;
+// ===============================
+// AMBIL SOAL DARI GOOGLE SHEETS
+// ===============================
 
-  const optionsContainer = document.getElementById("options-container");
-  optionsContainer.innerHTML = "";
+async function ambilSoal() {
 
-  q.pilihan.forEach(option => {
-    const btn = document.createElement("button");
-    btn.className = "option-btn";
-    btn.innerText = option;
-    btn.onclick = () => checkAnswer(option, q.jawabanBenar);
-    optionsContainer.appendChild(btn);
-  });
-}
+    try {
 
-// 4. Mengecek Jawaban Pemain & Gerakan Karakter 2D
-function checkAnswer(selectedOption, correctAnswer) {
-  if (selectedOption === correctAnswer) {
-    score += 10;
-    document.getElementById("score").innerText = score;
-    // Animasikan Karakter Maju ke Kanan
-    movePlayer(player2D.x + 50);
-  } else {
-    alert("Jawaban Kurang Tepat!");
-  }
+        document.getElementById("pertanyaan")
+            .innerText = "Memuat soal...";
 
-  currentQuestionIndex++;
-  displayQuestion();
-}
 
-// 5. Animasi Gerak Karakter 2D Sederhana pada Canvas
-function movePlayer(targetX) {
-  const animate = setInterval(() => {
-    if (player2D.x < targetX && player2D.x < canvas.width - player2D.width) {
-      player2D.x += player2D.speed;
-      drawPlayer();
-    } else {
-      clearInterval(animate);
+        const response =
+            await fetch(URL_GOOGLE_SCRIPT);
+
+
+        soal = await response.json();
+
+
+        if (!soal.length) {
+
+            alert("Soal tidak ditemukan!");
+
+            return;
+        }
+
+
+        // Acak soal
+        soal.sort(() => Math.random() - 0.5);
+
+
+        tampilkanSoal();
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Gagal mengambil soal dari Google Sheets."
+        );
     }
-  }, 10);
 }
 
-function drawPlayer() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  
-  // Gambar Garis Tanah
-  ctx.fillStyle = "#ffffff";
-  ctx.fillRect(0, 170, canvas.width, 4);
 
-  // Gambar Karakter
-  ctx.fillStyle = player2D.color;
-  ctx.fillRect(player2D.x, player2D.y, player2D.width, player2D.height);
+// ===============================
+// TAMPILKAN SOAL
+// ===============================
+
+function tampilkanSoal() {
+
+    const data =
+        soal[soalSekarang];
+
+
+    document.getElementById("nomorSoal")
+        .innerText =
+        `Soal ${soalSekarang + 1} / ${soal.length}`;
+
+
+    document.getElementById("skor")
+        .innerText = skor;
+
+
+    document.getElementById("pertanyaan")
+        .innerText =
+        data.pertanyaan;
+
+
+    document.getElementById("A")
+        .innerText =
+        "A. " + data.pilihanA;
+
+
+    document.getElementById("B")
+        .innerText =
+        "B. " + data.pilihanB;
+
+
+    document.getElementById("C")
+        .innerText =
+        "C. " + data.pilihanC;
+
+
+    document.getElementById("D")
+        .innerText =
+        "D. " + data.pilihanD;
+
+
+    document.getElementById("feedback")
+        .innerText = "";
+
+
+    aktifkanJawaban(true);
 }
 
-// 6. Akhir Game & Kirim Skor ke Google Sheets
-async function endGame() {
-  switchScreen("game-screen", "end-screen");
-  document.getElementById("final-score").innerText = score;
 
-  // Kirim data skor via POST ke Google Sheets
-  try {
-    await fetch(GOOGLE_SCRIPT_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nama: playerName, skor: score })
+// ===============================
+// JAWAB SOAL
+// ===============================
+
+function jawab(pilihan) {
+
+    const data =
+        soal[soalSekarang];
+
+
+    aktifkanJawaban(false);
+
+
+    if (
+        pilihan.toUpperCase() ===
+        String(data.jawaban).toUpperCase()
+    ) {
+
+        skor += 100;
+
+
+        document.getElementById("feedback")
+            .innerText =
+            "✅ BENAR! +100 poin";
+
+
+        document.getElementById(pilihan)
+            .classList.add("correct");
+
+    } else {
+
+        document.getElementById("feedback")
+            .innerText =
+            "❌ SALAH!";
+
+
+        document.getElementById(pilihan)
+            .classList.add("wrong");
+    }
+
+
+    document.getElementById("skor")
+        .innerText = skor;
+
+
+    setTimeout(() => {
+
+        soalSekarang++;
+
+
+        if (
+            soalSekarang >= soal.length
+        ) {
+
+            selesaiGame();
+
+        } else {
+
+            resetTombol();
+
+            tampilkanSoal();
+        }
+
+    }, 1200);
+}
+
+
+// ===============================
+// AKTIFKAN / MATIKAN JAWABAN
+// ===============================
+
+function aktifkanJawaban(status) {
+
+    ["A", "B", "C", "D"].forEach(id => {
+
+        document.getElementById(id)
+            .disabled = !status;
+
     });
-    document.getElementById("status-message").innerText = "Skor berhasil disimpan di Google Sheets!";
-  } catch (error) {
-    document.getElementById("status-message").innerText = "Gagal mengirim skor ke Google Sheets.";
-  }
 }
 
-// Helper: Pindah Tampilan Layar
-function switchScreen(fromId, toId) {
-  document.getElementById(fromId).classList.remove("active");
-  document.getElementById(toId).classList.add("active");
+
+// ===============================
+// RESET TOMBOL
+// ===============================
+
+function resetTombol() {
+
+    ["A", "B", "C", "D"].forEach(id => {
+
+        const tombol =
+            document.getElementById(id);
+
+        tombol.classList.remove(
+            "correct",
+            "wrong"
+        );
+
+    });
 }
 
-// Restart Permainan
-function restartGame() {
-  score = 0;
-  currentQuestionIndex = 0;
-  player2D.x = 50;
-  document.getElementById("score").innerText = score;
-  switchScreen("end-screen", "start-screen");
+
+// ===============================
+// GAME SELESAI
+// ===============================
+
+async function selesaiGame() {
+
+    document
+        .getElementById("quizScreen")
+        .classList.add("hidden");
+
+
+    document
+        .getElementById("resultScreen")
+        .classList.remove("hidden");
+
+
+    document.getElementById("hasilNama")
+        .innerText =
+        namaPemain;
+
+
+    document.getElementById("hasilSkor")
+        .innerText =
+        skor;
+
+
+    let pesan = "";
+
+
+    if (skor >= soal.length * 80) {
+
+        pesan =
+            "🌟 Luar biasa! Kamu sangat pintar!";
+
+    } else if (skor >= soal.length * 50) {
+
+        pesan =
+            "👍 Bagus! Terus belajar ya!";
+
+    } else {
+
+        pesan =
+            "💪 Jangan menyerah! Coba lagi!";
+
+    }
+
+
+    document.getElementById("hasilPesan")
+        .innerText = pesan;
+
+
+    await simpanSkor();
+}
+
+
+// ===============================
+// SIMPAN SKOR KE GOOGLE SHEETS
+// ===============================
+
+async function simpanSkor() {
+
+    try {
+
+        await fetch(
+            URL_GOOGLE_SCRIPT,
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "text/plain;charset=utf-8"
+                },
+
+                body: JSON.stringify({
+
+                    nama: namaPemain,
+
+                    skor: skor
+
+                })
+            }
+        );
+
+        console.log(
+            "Skor berhasil disimpan."
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Gagal menyimpan skor:",
+            error
+        );
+    }
 }
