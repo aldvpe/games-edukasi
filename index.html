@@ -3,47 +3,44 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Game Edukasi Kuis - Google Sheets</title>
+  <title>Game Edukasi 2D - Quiz Adventure</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <div class="game-card">
-    <!-- Layar Loading -->
-    <div id="loading-screen" class="loader">
-      Memuat soal dari Google Sheets...
+  <div class="game-container">
+    <!-- Screen 1: Form Nama Pemain -->
+    <div id="start-screen" class="screen active">
+      <h1>🎮 Educational Quiz Game</h1>
+      <p>Masukkan nama kamu untuk memulai permainan!</p>
+      <input type="text" id="player-name" placeholder="Nama Kamu" required />
+      <button id="btn-start" onclick="startGame()">Mulai Game</button>
     </div>
 
-    <!-- Layar Input Nama -->
-    <div id="start-screen" class="hidden">
-      <h1>Game Kuis Edukasi</h1>
-      <p>Masukkan nama kamu untuk memulai:</p>
-      <input type="text" id="player-name" placeholder="Nama Lengkap" required>
-      <button class="btn-submit" onclick="startGame()">Mulai Bermain</button>
-    </div>
-
-    <!-- Layar Permainan -->
-    <div id="game-screen" class="hidden">
-      <div class="status-bar">
-        <span>Soal: <span id="current-question-num">1</span>/<span id="total-questions">0</span></span>
-        <span>Skor: <span id="score">0</span></span>
+    <!-- Screen 2: Area Permainan Game 2D -->
+    <div id="game-screen" class="screen">
+      <div class="header-info">
+        <span>Pemain: <strong id="display-name">-</strong></span>
+        <span>Skor: <strong id="score">0</strong></span>
       </div>
-      <div id="question" class="question-box">Memuat soal...</div>
-      <div class="options-grid">
-        <button class="btn-option" onclick="checkAnswer('A')" id="opt-A">A</button>
-        <button class="btn-option" onclick="checkAnswer('B')" id="opt-B">B</button>
-        <button class="btn-option" onclick="checkAnswer('C')" id="opt-C">C</button>
-        <button class="btn-option" onclick="checkAnswer('D')" id="opt-D">D</button>
+
+      <!-- Canvas untuk Elemen Game 2D -->
+      <canvas id="gameCanvas" width="600" height="200"></canvas>
+
+      <!-- Modal/Pop-up Soal yang Diambil dari Google Sheets -->
+      <div id="quiz-box">
+        <h3 id="question-text">Memuat pertanyaan...</h3>
+        <div id="options-container" class="options-grid"></div>
       </div>
     </div>
 
-    <!-- Layar Hasil -->
-    <div id="end-screen" class="hidden">
-      <h1>Permainan Selesai!</h1>
+    <!-- Screen 3: Hasil & Skor Akhir -->
+    <div id="end-screen" class="screen">
+      <h1>🎉 Permainan Selesai!</h1>
       <p>Skor Akhir Kamu:</p>
-      <h2 id="final-score" class="final-score-text">0</h2>
-      <p id="save-status">Menyimpan skor ke Google Sheets...</p>
-      <button class="btn-submit" onclick="location.reload()">Main Lagi</button>
+      <h2 id="final-score">0</h2>
+      <p id="status-message">Mengirim skor ke Google Sheets...</p>
+      <button onclick="restartGame()">Main Lagi</button>
     </div>
   </div>
 
