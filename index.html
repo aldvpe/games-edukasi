@@ -1,39 +1,155 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EduQuest 2D - Modern Learning Game</title>
-  <!-- Google Fonts for Modern Typography -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  
-  <!-- File CSS Eksternal -->
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Quiz Adventure</title>
+
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-  <div id="game-container">
-    <canvas id="gameCanvas"></canvas>
-    
-    <!-- HUD Overlay -->
-    <div id="hud">
-      <div class="hud-box">Skor: <span id="score">0</span></div>
-      <div class="hud-box">Nyawa: <span id="lives">❤️❤️❤️</span></div>
-    </div>
+<div class="container">
 
-    <!-- Quiz Modal Container -->
-    <div id="quiz-modal">
-      <div class="badge" id="quiz-category">Kategori</div>
-      <div class="question-text" id="quiz-question">Pertanyaan akan muncul di sini...</div>
-      <div class="options-grid" id="options-container">
-        <!-- Opsi jawaban dimasukkan secara dinamis via script.js -->
-      </div>
-    </div>
-  </div>
+    <!-- MENU -->
+    <section id="menu" class="screen active">
 
-  <!-- File JavaScript Eksternal -->
-  <script src="script.js"></script>
+        <div class="logo">🧠</div>
+
+        <h1>QUIZ<br>ADVENTURE</h1>
+
+        <p class="subtitle">
+            Uji pengetahuanmu dan jadilah
+            yang terbaik!
+        </p>
+
+        <input
+            type="text"
+            id="username"
+            placeholder="Masukkan username"
+            maxlength="20"
+        >
+
+        <button id="startBtn">
+            🚀 MULAI BERMAIN
+        </button>
+
+        <button id="leaderboardBtn" class="secondary">
+            🏆 LEADERBOARD
+        </button>
+
+    </section>
+
+
+    <!-- GAME -->
+    <section id="game" class="screen">
+
+        <div class="topbar">
+
+            <div>
+                ⭐ <span id="score">0</span>
+            </div>
+
+            <div>
+                ❤️ <span id="lives">3</span>
+            </div>
+
+            <div>
+                ⏱️ <span id="timer">15</span>
+            </div>
+
+        </div>
+
+        <div class="progress">
+            <div id="progressBar"></div>
+        </div>
+
+        <div class="question-box">
+
+            <span id="questionNumber">
+                Soal 1
+            </span>
+
+            <h2 id="question">
+                Pertanyaan
+            </h2>
+
+        </div>
+
+        <div id="answers" class="answers"></div>
+
+    </section>
+
+
+    <!-- RESULT -->
+    <section id="result" class="screen">
+
+        <div class="result-icon">
+            🏆
+        </div>
+
+        <h1>GAME SELESAI!</h1>
+
+        <p>Pemain</p>
+
+        <h2 id="resultName">
+            -
+        </h2>
+
+        <div class="final-score">
+
+            <span>SKOR</span>
+
+            <strong id="finalScore">
+                0
+            </strong>
+
+        </div>
+
+        <p id="resultMessage">
+            Bagus!
+        </p>
+
+        <button id="saveBtn">
+            ☁️ SIMPAN SKOR
+        </button>
+
+        <button id="restartBtn" class="secondary">
+            🔄 MAIN LAGI
+        </button>
+
+        <button id="resultLeaderboardBtn" class="secondary">
+            🏆 LEADERBOARD
+        </button>
+
+    </section>
+
+
+    <!-- LEADERBOARD -->
+    <section id="leaderboard" class="screen">
+
+        <h1>🏆 LEADERBOARD</h1>
+
+        <p class="subtitle">
+            Pemain dengan skor tertinggi
+        </p>
+
+        <div id="leaderboardList">
+            Loading...
+        </div>
+
+        <button id="backBtn" class="secondary">
+            ← KEMBALI
+        </button>
+
+    </section>
+
+</div>
+
+<script src="script.js"></script>
+
 </body>
 </html>
