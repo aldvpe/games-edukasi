@@ -1,113 +1,39 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>EduGame 2D</title>
-
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduQuest 2D - Modern Learning Game</title>
+  <!-- Google Fonts for Modern Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <!-- File CSS Eksternal -->
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-<div class="game">
-
-    <div id="startScreen" class="screen">
-        <h1>🎮 EDU GAME</h1>
-
-        <p>
-            Uji pengetahuanmu dan dapatkan skor tertinggi!
-        </p>
-
-        <input
-            type="text"
-            id="nama"
-            placeholder="Masukkan nama kamu"
-        >
-
-        <button onclick="mulaiGame()">
-            MULAI GAME
-        </button>
+  <div id="game-container">
+    <canvas id="gameCanvas"></canvas>
+    
+    <!-- HUD Overlay -->
+    <div id="hud">
+      <div class="hud-box">Skor: <span id="score">0</span></div>
+      <div class="hud-box">Nyawa: <span id="lives">❤️❤️❤️</span></div>
     </div>
 
-
-    <div id="quizScreen" class="screen hidden">
-
-        <div class="topbar">
-            <span id="nomorSoal">
-                Soal 1
-            </span>
-
-            <span>
-                Skor: <b id="skor">0</b>
-            </span>
-        </div>
-
-        <div class="character">
-            🧑‍🎓
-        </div>
-
-        <div class="question-box">
-            <h2 id="pertanyaan">
-                Memuat soal...
-            </h2>
-        </div>
-
-        <div class="answers">
-
-            <button onclick="jawab('A')" id="A">
-                A. -
-            </button>
-
-            <button onclick="jawab('B')" id="B">
-                B. -
-            </button>
-
-            <button onclick="jawab('C')" id="C">
-                C. -
-            </button>
-
-            <button onclick="jawab('D')" id="D">
-                D. -
-            </button>
-
-        </div>
-
-        <p id="feedback"></p>
-
+    <!-- Quiz Modal Container -->
+    <div id="quiz-modal">
+      <div class="badge" id="quiz-category">Kategori</div>
+      <div class="question-text" id="quiz-question">Pertanyaan akan muncul di sini...</div>
+      <div class="options-grid" id="options-container">
+        <!-- Opsi jawaban dimasukkan secara dinamis via script.js -->
+      </div>
     </div>
+  </div>
 
-
-    <div id="resultScreen" class="screen hidden">
-
-        <h1>🎉 SELESAI!</h1>
-
-        <div class="result-character">
-            🏆
-        </div>
-
-        <h2 id="hasilNama"></h2>
-
-        <p>
-            Skor kamu:
-        </p>
-
-        <div class="final-score" id="hasilSkor">
-            0
-        </div>
-
-        <p id="hasilPesan"></p>
-
-        <button onclick="location.reload()">
-            MAIN LAGI
-        </button>
-
-    </div>
-
-</div>
-
-<script src="script.js"></script>
-
+  <!-- File JavaScript Eksternal -->
+  <script src="script.js"></script>
 </body>
 </html>
