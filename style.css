@@ -1,155 +1,121 @@
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
 }
 
 body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-
-    min-height: 100vh;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    background:
-        linear-gradient(
-            #74d7ff 0%,
-            #74d7ff 65%,
-            #7bd66f 65%,
-            #7bd66f 100%
-        );
+  background: #0f172a;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  overflow: hidden;
 }
 
-.game {
-    width: 95%;
-    max-width: 700px;
+#game-container {
+  position: relative;
+  width: 800px;
+  height: 500px;
+  background: #1e293b;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  border: 2px solid #38bdf8;
 }
 
-.screen {
-    background: white;
-
-    border: 5px solid #222;
-    border-radius: 25px;
-
-    padding: 30px;
-
-    text-align: center;
-
-    box-shadow:
-        0 10px 0 #222;
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
-.hidden {
-    display: none;
+/* HUD (Heads-Up Display) */
+#hud {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  right: 15px;
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+  font-size: 1.1rem;
+  pointer-events: none;
 }
 
-h1 {
-    font-size: 42px;
-    color: #ff7b00;
+.hud-box {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(4px);
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid #475569;
 }
 
-input {
-    width: 90%;
-
-    padding: 15px;
-
-    margin: 20px 0;
-
-    border: 3px solid #333;
-    border-radius: 12px;
-
-    font-size: 18px;
+/* Quiz Overlay Modal */
+#quiz-modal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.95);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+  display: none;
+  z-index: 10;
 }
 
-button {
-    width: 100%;
-
-    padding: 16px;
-
-    margin: 8px 0;
-
-    border: 3px solid #222;
-    border-radius: 15px;
-
-    background: #ffd43b;
-
-    font-size: 18px;
-    font-weight: bold;
-
-    cursor: pointer;
-
-    transition: 0.15s;
+.badge {
+  background: #38bdf8;
+  color: #0f172a;
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-button:hover {
-    transform: translateY(-3px);
-
-    background: #ffb703;
+.question-text {
+  font-size: 1.4rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 24px;
+  color: #f8fafc;
+  max-width: 600px;
+  line-height: 1.4;
 }
 
-button:active {
-    transform: translateY(2px);
+.options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  width: 100%;
+  max-width: 550px;
 }
 
-.topbar {
-    display: flex;
-    justify-content: space-between;
-
-    font-size: 20px;
-    font-weight: bold;
-
-    margin-bottom: 15px;
+.btn-option {
+  background: #334155;
+  border: 2px solid #475569;
+  color: #fff;
+  padding: 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  text-align: left;
 }
 
-.character {
-    font-size: 80px;
-}
-
-.question-box {
-    background: #eef7ff;
-
-    border: 3px solid #333;
-
-    border-radius: 15px;
-
-    padding: 10px 20px;
-
-    margin: 20px 0;
-}
-
-.answers button {
-    text-align: left;
-
-    background: #fff;
-}
-
-.answers button.correct {
-    background: #55efc4;
-}
-
-.answers button.wrong {
-    background: #ff7675;
-}
-
-#feedback {
-    font-size: 22px;
-    font-weight: bold;
-
-    min-height: 30px;
-}
-
-.result-character {
-    font-size: 100px;
-}
-
-.final-score {
-    font-size: 70px;
-    font-weight: bold;
-
-    color: #ff7b00;
-}
-
-#hasilPesan {
-    font-size: 20px;
+.btn-option:hover {
+  background: #38bdf8;
+  color: #0f172a;
+  border-color: #38bdf8;
+  transform: translateY(-2px);
 }
