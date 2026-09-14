@@ -1,219 +1,803 @@
-// URL Web App Google Apps Script Anda
-const GOOGLE_SHEETS_URL = "URL_WEB_APP_GOOGLE_SHEETS_ANDA";
+/* =====================================================
+   GOOGLE APPS SCRIPT URL
+===================================================== */
 
-let questions = [];
-let currentQuestion = null;
-let score = 0;
-let lives = 3;
+const API_URL =
+    "MASUKKAN_URL_GOOGLE_APPS_SCRIPT_DI_SINI";
 
-// Canvas Setup
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
-canvas.width = 800;
-canvas.height = 500;
 
-// Game State & Entities
-const player = {
-  x: 50,
-  y: 380,
-  width: 40,
-  height: 40,
-  color: "#38bdf8",
-  speed: 5,
-  dy: 0,
-  isJumping: false
-};
+/* =====================================================
+   SOAL
+===================================================== */
 
-const chests = [
-  { x: 250, y: 380, size: 40, active: true },
-  { x: 500, y: 380, size: 40, active: true },
-  { x: 700, y: 380, size: 40, active: true }
+const questions = [
+
+    {
+        question:
+            "Planet manakah yang dikenal sebagai Planet Merah?",
+
+        answers: [
+            "Venus",
+            "Mars",
+            "Jupiter",
+            "Saturnus"
+        ],
+
+        correct: 1
+    },
+
+    {
+        question:
+            "Berapa hasil dari 12 × 5?",
+
+        answers: [
+            "50",
+            "55",
+            "60",
+            "65"
+        ],
+
+        correct: 2
+    },
+
+    {
+        question:
+            "Bahasa yang digunakan untuk mengatur tampilan website adalah?",
+
+        answers: [
+            "HTML",
+            "CSS",
+            "Python",
+            "SQL"
+        ],
+
+        correct: 1
+    },
+
+    {
+        question:
+            "Ibukota Indonesia adalah?",
+
+        answers: [
+            "Bandung",
+            "Surabaya",
+            "Jakarta",
+            "Semarang"
+        ],
+
+        correct: 2
+    },
+
+    {
+        question:
+            "Organ tubuh yang berfungsi memompa darah adalah?",
+
+        answers: [
+            "Paru-paru",
+            "Jantung",
+            "Ginjal",
+            "Hati"
+        ],
+
+        correct: 1
+    },
+
+    {
+        question:
+            "Satuan SI untuk panjang adalah?",
+
+        answers: [
+            "Kilogram",
+            "Liter",
+            "Meter",
+            "Detik"
+        ],
+
+        correct: 2
+    },
+
+    {
+        question:
+            "Hasil dari 100 ÷ 4 adalah?",
+
+        answers: [
+            "20",
+            "25",
+            "30",
+            "40"
+        ],
+
+        correct: 1
+    },
+
+    {
+        question:
+            "Hewan yang mengalami metamorfosis sempurna adalah?",
+
+        answers: [
+            "Kupu-kupu",
+            "Kucing",
+            "Ayam",
+            "Sapi"
+        ],
+
+        correct: 0
+    },
+
+    {
+        question:
+            "HTML merupakan singkatan dari?",
+
+        answers: [
+            "Hyper Text Markup Language",
+            "High Text Machine Language",
+            "Hyper Tool Multi Language",
+            "Home Text Markup Language"
+        ],
+
+        correct: 0
+    },
+
+    {
+        question:
+            "Alat untuk mengukur suhu disebut?",
+
+        answers: [
+            "Barometer",
+            "Termometer",
+            "Speedometer",
+            "Higrometer"
+        ],
+
+        correct: 1
+    }
+
 ];
 
-const gravity = 0.5;
-const keys = {};
 
-// Input Handlers
-window.addEventListener("keydown", (e) => keys[e.code] = true);
-window.addEventListener("keyup", (e) => keys[e.code] = false);
+/* =====================================================
+   ELEMENT
+===================================================== */
 
-// Fetch Data Soal dari Google Sheets API
-async function loadQuestions() {
-  try {
-    const res = await fetch(GOOGLE_SHEETS_URL);
-    questions = await res.json();
-    console.log("Soal berhasil dimuat dari Google Sheets:", questions);
-  } catch (err) {
-    console.warn("Gagal terhubung ke Google Sheets API. Menggunakan soal cadangan/fallback.", err);
-    // Soal fallback jika API belum dikonfigurasi
-    questions = [
-      {
-        Kategori: "Matematika",
-        Tipe: "pilihan_ganda",
-        Pertanyaan: "Berapakah hasil dari 15 + 27?",
-        OpsiA: "40",
-        OpsiB: "42",
-        OpsiC: "44",
-        OpsiD: "46",
-        JawabanBenar: "B"
-      },
-      {
-        Kategori: "Sains",
-        Tipe: "pilihan_ganda",
-        Pertanyaan: "Planet terdekat dari Matahari adalah?",
-        OpsiA: "Venus",
-        OpsiB: "Mars",
-        OpsiC: "Merkurius",
-        OpsiD: "Bumi",
-        JawabanBenar: "C"
-      },
-      {
-        Kategori: "Bahasa",
-        Tipe: "pilihan_ganda",
-        Pertanyaan: "Sinonim dari kata 'Pintar' adalah?",
-        OpsiA: "Pandai",
-        OpsiB: "Malas",
-        OpsiC: "Lambat",
-        OpsiD: "Gagal",
-        JawabanBenar: "A"
-      }
-    ];
-  }
+const menu =
+    document.getElementById("menu");
+
+const game =
+    document.getElementById("game");
+
+const result =
+    document.getElementById("result");
+
+const leaderboard =
+    document.getElementById("leaderboard");
+
+const username =
+    document.getElementById("username");
+
+const startBtn =
+    document.getElementById("startBtn");
+
+const leaderboardBtn =
+    document.getElementById("leaderboardBtn");
+
+const resultLeaderboardBtn =
+    document.getElementById(
+        "resultLeaderboardBtn"
+    );
+
+const backBtn =
+    document.getElementById("backBtn");
+
+const restartBtn =
+    document.getElementById("restartBtn");
+
+const saveBtn =
+    document.getElementById("saveBtn");
+
+const question =
+    document.getElementById("question");
+
+const questionNumber =
+    document.getElementById(
+        "questionNumber"
+    );
+
+const answers =
+    document.getElementById("answers");
+
+const scoreElement =
+    document.getElementById("score");
+
+const livesElement =
+    document.getElementById("lives");
+
+const timerElement =
+    document.getElementById("timer");
+
+const progressBar =
+    document.getElementById(
+        "progressBar"
+    );
+
+const resultName =
+    document.getElementById("resultName");
+
+const finalScore =
+    document.getElementById("finalScore");
+
+const resultMessage =
+    document.getElementById(
+        "resultMessage"
+    );
+
+const leaderboardList =
+    document.getElementById(
+        "leaderboardList"
+    );
+
+
+/* =====================================================
+   GAME VARIABLE
+===================================================== */
+
+let currentQuestion = 0;
+
+let score = 0;
+
+let lives = 3;
+
+let timer = 15;
+
+let timerInterval;
+
+let playerName = "";
+
+
+/* =====================================================
+   SCREEN
+===================================================== */
+
+function showScreen(screen) {
+
+    document
+        .querySelectorAll(".screen")
+        .forEach(item => {
+
+            item.classList.remove("active");
+
+        });
+
+    screen.classList.add("active");
 }
 
-// Game Logic Update
-function update() {
-  // Movement
-  if (keys["ArrowRight"] || keys["KeyD"]) player.x += player.speed;
-  if (keys["ArrowLeft"] || keys["KeyA"]) player.x -= player.speed;
 
-  // Jump
-  if ((keys["Space"] || keys["ArrowUp"]) && !player.isJumping) {
-    player.dy = -10;
-    player.isJumping = true;
-  }
+/* =====================================================
+   START GAME
+===================================================== */
 
-  // Gravity & Physics
-  player.dy += gravity;
-  player.y += player.dy;
+startBtn.addEventListener(
+    "click",
+    startGame
+);
 
-  // Screen Bounds (Player)
-  if (player.x < 0) player.x = 0;
-  if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
 
-  // Ground Collision
-  if (player.y >= 380) {
-    player.y = 380;
-    player.dy = 0;
-    player.isJumping = false;
-  }
+function startGame() {
 
-  // Collision Detection (Player vs Chests)
-  chests.forEach((chest) => {
+    playerName =
+        username.value.trim();
+
+    if (!playerName) {
+
+        alert(
+            "Masukkan username terlebih dahulu!"
+        );
+
+        return;
+    }
+
+    currentQuestion = 0;
+
+    score = 0;
+
+    lives = 3;
+
+    scoreElement.textContent = score;
+
+    livesElement.textContent = lives;
+
+    showScreen(game);
+
+    loadQuestion();
+}
+
+
+/* =====================================================
+   LOAD QUESTION
+===================================================== */
+
+function loadQuestion() {
+
+    clearInterval(timerInterval);
+
     if (
-      chest.active &&
-      Math.abs(player.x - chest.x) < 30 &&
-      Math.abs(player.y - chest.y) < 30
+        currentQuestion >=
+        questions.length
     ) {
-      chest.active = false;
-      triggerQuiz();
+
+        finishGame();
+
+        return;
     }
-  });
+
+
+    const q =
+        questions[currentQuestion];
+
+
+    questionNumber.textContent =
+        `Soal ${currentQuestion + 1} / ${questions.length}`;
+
+
+    question.textContent =
+        q.question;
+
+
+    answers.innerHTML = "";
+
+
+    q.answers.forEach(
+        (answer, index) => {
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+            button.className =
+                "answer";
+
+            button.textContent =
+                answer;
+
+            button.addEventListener(
+                "click",
+                () => checkAnswer(
+                    index,
+                    button
+                )
+            );
+
+            answers.appendChild(
+                button
+            );
+        }
+    );
+
+
+    const progress =
+        (
+            currentQuestion /
+            questions.length
+        ) * 100;
+
+    progressBar.style.width =
+        progress + "%";
+
+
+    startTimer();
 }
 
-// Render 2D Canvas
-function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Draw Ground
-  ctx.fillStyle = "#334155";
-  ctx.fillRect(0, 420, canvas.width, 80);
+/* =====================================================
+   TIMER
+===================================================== */
 
-  // Draw Player
-  ctx.fillStyle = player.color;
-  ctx.fillRect(player.x, player.y, player.width, player.height);
+function startTimer() {
 
-  // Draw Interactive Chests
-  chests.forEach((chest) => {
-    if (chest.active) {
-      ctx.fillStyle = "#f59e0b";
-      ctx.fillRect(chest.x, chest.y, chest.size, chest.size);
+    timer = 15;
+
+    timerElement.textContent =
+        timer;
+
+
+    timerInterval =
+        setInterval(() => {
+
+            timer--;
+
+            timerElement.textContent =
+                timer;
+
+
+            if (timer <= 0) {
+
+                clearInterval(
+                    timerInterval
+                );
+
+                lives--;
+
+                livesElement.textContent =
+                    lives;
+
+                nextQuestion();
+            }
+
+        }, 1000);
+}
+
+
+/* =====================================================
+   ANSWER
+===================================================== */
+
+function checkAnswer(
+    selected,
+    button
+) {
+
+    clearInterval(
+        timerInterval
+    );
+
+
+    const q =
+        questions[currentQuestion];
+
+
+    const allButtons =
+        document.querySelectorAll(
+            ".answer"
+        );
+
+
+    allButtons.forEach(btn => {
+
+        btn.classList.add(
+            "disabled"
+        );
+
+    });
+
+
+    if (
+        selected ===
+        q.correct
+    ) {
+
+        button.classList.add(
+            "correct"
+        );
+
+        score += 100;
+
+        scoreElement.textContent =
+            score;
+
+    } else {
+
+        button.classList.add(
+            "wrong"
+        );
+
+        allButtons[
+            q.correct
+        ].classList.add(
+            "correct"
+        );
+
+        lives--;
+
+        livesElement.textContent =
+            lives;
     }
-  });
+
+
+    setTimeout(
+        nextQuestion,
+        700
+    );
 }
 
-// Game Main Loop
-function gameLoop() {
-  update();
-  draw();
-  requestAnimationFrame(gameLoop);
-}
 
-// Trigger Quiz Dialog
-function triggerQuiz() {
-  if (questions.length === 0) return;
+/* =====================================================
+   NEXT QUESTION
+===================================================== */
 
-  // Pilih soal secara acak dari array
-  currentQuestion = questions[Math.floor(Math.random() * questions.length)];
-
-  document.getElementById("quiz-category").innerText = currentQuestion.Kategori || "UMUM";
-  document.getElementById("quiz-question").innerText = currentQuestion.Pertanyaan;
-
-  const container = document.getElementById("options-container");
-  container.innerHTML = "";
-
-  const options = [
-    { key: "A", text: currentQuestion.OpsiA },
-    { key: "B", text: currentQuestion.OpsiB },
-    { key: "C", text: currentQuestion.OpsiC },
-    { key: "D", text: currentQuestion.OpsiD }
-  ];
-
-  options.forEach((opt) => {
-    if (opt.text) {
-      const btn = document.createElement("button");
-      btn.className = "btn-option";
-      btn.innerText = `${opt.key}. ${opt.text}`;
-      btn.onclick = () => checkAnswer(opt.key);
-      container.appendChild(btn);
-    }
-  });
-
-  document.getElementById("quiz-modal").style.display = "flex";
-}
-
-// Check Answer Logic
-function checkAnswer(selectedKey) {
-  document.getElementById("quiz-modal").style.display = "none";
-
-  if (selectedKey === currentQuestion.JawabanBenar) {
-    score += 10;
-    document.getElementById("score").innerText = score;
-    alert("✨ BENAR! +10 Poin");
-  } else {
-    lives--;
-    document.getElementById("lives").innerText = "❤️".repeat(Math.max(0, lives));
-    alert(`❌ SALAH! Jawaban yang benar adalah (${currentQuestion.JawabanBenar})`);
+function nextQuestion() {
 
     if (lives <= 0) {
-      alert("Game Over! Skor akhir Anda: " + score);
-      resetGame();
+
+        finishGame();
+
+        return;
     }
-  }
+
+    currentQuestion++;
+
+    loadQuestion();
 }
 
-// Reset Game State
-function resetGame() {
-  score = 0;
-  lives = 3;
-  player.x = 50;
-  player.y = 380;
-  chests.forEach((chest) => (chest.active = true));
-  document.getElementById("score").innerText = score;
-  document.getElementById("lives").innerText = "❤️❤️❤️";
+
+/* =====================================================
+   FINISH
+===================================================== */
+
+function finishGame() {
+
+    clearInterval(
+        timerInterval
+    );
+
+    showScreen(result);
+
+    resultName.textContent =
+        playerName;
+
+    finalScore.textContent =
+        score;
+
+
+    if (score >= 800) {
+
+        resultMessage.textContent =
+            "🔥 Luar biasa! Pengetahuanmu hebat!";
+
+    } else if (score >= 500) {
+
+        resultMessage.textContent =
+            "👏 Bagus! Terus tingkatkan!";
+
+    } else {
+
+        resultMessage.textContent =
+            "💪 Jangan menyerah, coba lagi!";
+
+    }
+
+    saveBtn.disabled = false;
+
+    saveBtn.textContent =
+        "☁️ SIMPAN SKOR";
 }
 
-// Start Game
-loadQuestions().then(() => {
-  gameLoop();
-});
+
+/* =====================================================
+   SAVE TO GOOGLE SHEETS
+===================================================== */
+
+saveBtn.addEventListener(
+    "click",
+    saveScore
+);
+
+
+async function saveScore() {
+
+    if (
+        !API_URL ||
+        API_URL.includes(
+            "MASUKKAN_URL"
+        )
+    ) {
+
+        alert(
+            "URL Google Apps Script belum dipasang!"
+        );
+
+        return;
+    }
+
+
+    saveBtn.disabled = true;
+
+    saveBtn.textContent =
+        "⏳ MENYIMPAN...";
+
+
+    try {
+
+        const response =
+            await fetch(API_URL, {
+
+                method: "POST",
+
+                body: JSON.stringify({
+
+                    username:
+                        playerName,
+
+                    score:
+                        score
+
+                })
+
+            });
+
+
+        const data =
+            await response.json();
+
+
+        if (data.success) {
+
+            saveBtn.textContent =
+                "✅ SKOR TERSIMPAN";
+
+        } else {
+
+            throw new Error(
+                "Gagal menyimpan"
+            );
+        }
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Gagal menyimpan skor. Coba lagi."
+        );
+
+        saveBtn.disabled = false;
+
+        saveBtn.textContent =
+            "☁️ SIMPAN SKOR";
+    }
+}
+
+
+/* =====================================================
+   LEADERBOARD
+===================================================== */
+
+leaderboardBtn.addEventListener(
+    "click",
+    showLeaderboard
+);
+
+
+resultLeaderboardBtn.addEventListener(
+    "click",
+    showLeaderboard
+);
+
+
+async function showLeaderboard() {
+
+    showScreen(leaderboard);
+
+    leaderboardList.innerHTML =
+        "⏳ Memuat leaderboard...";
+
+
+    try {
+
+        const response =
+            await fetch(API_URL);
+
+
+        const data =
+            await response.json();
+
+
+        if (!data.success) {
+
+            throw new Error(
+                "Leaderboard gagal"
+            );
+        }
+
+
+        leaderboardList.innerHTML =
+            "";
+
+
+        if (
+            data.players.length === 0
+        ) {
+
+            leaderboardList.innerHTML =
+                "Belum ada pemain.";
+
+            return;
+        }
+
+
+        data.players.forEach(
+            (player, index) => {
+
+                const div =
+                    document.createElement(
+                        "div"
+                    );
+
+                div.className =
+                    "player";
+
+
+                let medal = "";
+
+                if (index === 0)
+                    medal = "🥇";
+
+                else if (index === 1)
+                    medal = "🥈";
+
+                else if (index === 2)
+                    medal = "🥉";
+
+                else
+                    medal =
+                        `${index + 1}`;
+
+
+                div.innerHTML = `
+
+                    <div class="rank">
+                        ${medal}
+                    </div>
+
+                    <div class="player-name">
+                        ${escapeHTML(
+                            player.username
+                        )}
+                    </div>
+
+                    <div class="player-score">
+                        ${player.score}
+                    </div>
+
+                `;
+
+
+                leaderboardList.appendChild(
+                    div
+                );
+            }
+        );
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        leaderboardList.innerHTML =
+            "❌ Gagal mengambil data leaderboard.";
+    }
+}
+
+
+/* =====================================================
+   BACK
+===================================================== */
+
+backBtn.addEventListener(
+    "click",
+    () => showScreen(menu)
+);
+
+
+restartBtn.addEventListener(
+    "click",
+    startGame
+);
+
+
+/* =====================================================
+   SECURITY
+===================================================== */
+
+function escapeHTML(text) {
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+    div.textContent =
+        text;
+
+    return div.innerHTML;
+}
