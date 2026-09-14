@@ -3,118 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduQuest - Game Edukasi</title>
+    <title>Game Edukasi 2D/3D Integrasi Google Sheets</title>
+    <!-- Library Three.js untuk Mode 3D -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-    <div class="game-container">
-
-        <!-- START SCREEN -->
-        <section id="startScreen" class="screen active">
-            <div class="logo">🎓</div>
-            <h1>Edu<span>Quest</span></h1>
-            <p>Petualangan belajar yang menyenangkan!</p>
-
-            <input
-                type="text"
-                id="playerName"
-                placeholder="Masukkan nama kamu..."
-                maxlength="20"
-            >
-
-            <button id="startBtn" class="main-btn">
-                🚀 Mulai Bermain
-            </button>
-        </section>
-
-        <!-- GAME SCREEN -->
-        <section id="gameScreen" class="screen">
-
-            <div class="top-bar">
-                <div class="stat">
-                    ❤️ <span id="lives">3</span>
-                </div>
-
-                <div class="stat">
-                    ⭐ <span id="score">0</span>
-                </div>
-
-                <div class="stat">
-                    🏆 Level <span id="level">1</span>
-                </div>
-
-                <div class="stat">
-                    ⏱️ <span id="timer">15</span>
-                </div>
+    <div id="game-container">
+        <!-- Header Mode Selector -->
+        <header>
+            <div class="header-title">EduGame 2D/3D</div>
+            <div class="mode-selector">
+                <button class="btn-mode active" id="btn-2d" onclick="switchMode('2D')">Mode 2D</button>
+                <button class="btn-mode" id="btn-3d" onclick="switchMode('3D')">Mode 3D</button>
             </div>
+        </header>
 
-            <div class="progress-container">
-                <div id="progressBar"></div>
+        <!-- Viewport Area Canvas -->
+        <div id="viewport">
+            <canvas id="canvas2d" width="800" height="540"></canvas>
+        </div>
+
+        <!-- Layar Awal (Start Screen) -->
+        <div id="start-screen" class="overlay-screen">
+            <h1>Game Edukasi Interaktif</h1>
+            <p>Jelajahi dunia 2D atau 3D, kumpulkan koin soal, dan dapatkan skor tertinggi yang terintegrasi langsung dengan Google Sheets!</p>
+            <input type="text" id="player-name" placeholder="Masukkan Nama Pemain" required>
+            <button class="btn-primary" onclick="startGame()">Mulai Petualangan</button>
+            <div class="controls-hint">Kontrol: Tombol Panah / W-A-S-D untuk bergerak.</div>
+        </div>
+
+        <!-- Card Pop-up Kuis Soal -->
+        <div id="quiz-card" class="hidden">
+            <div class="quiz-header">
+                <span>Soal <span id="q-num">1</span>/5</span>
+                <span>Skor: <span id="score-val">0</span></span>
             </div>
-
-            <div class="question-card">
-
-                <div class="question-number">
-                    Pertanyaan <span id="questionNumber">1</span>
-                </div>
-
-                <h2 id="question">
-                    Loading...
-                </h2>
-
-                <div id="answers" class="answers"></div>
-
-                <div id="feedback" class="feedback"></div>
-
-                <button id="nextBtn" class="next-btn hidden">
-                    Pertanyaan Berikutnya →
-                </button>
-
+            <div class="quiz-question" id="q-text">Pertanyaan akan muncul di sini...</div>
+            <div class="quiz-options">
+                <button class="btn-opt" onclick="submitAnswer('A')" id="opt-A">A. Option 1</button>
+                <button class="btn-opt" onclick="submitAnswer('B')" id="opt-B">B. Option 2</button>
+                <button class="btn-opt" onclick="submitAnswer('C')" id="opt-C">C. Option 3</button>
+                <button class="btn-opt" onclick="submitAnswer('D')" id="opt-D">D. Option 4</button>
             </div>
+        </div>
 
-        </section>
-
-        <!-- RESULT SCREEN -->
-        <section id="resultScreen" class="screen">
-
-            <div class="result-icon">🏆</div>
-
-            <h1>Permainan Selesai!</h1>
-
-            <p id="resultMessage"></p>
-
-            <div class="result-card">
-                <div>
-                    <span>Nama</span>
-                    <strong id="resultName">-</strong>
-                </div>
-
-                <div>
-                    <span>Skor</span>
-                    <strong id="resultScore">0</strong>
-                </div>
-
-                <div>
-                    <span>Benar</span>
-                    <strong id="resultCorrect">0</strong>
-                </div>
-
-                <div>
-                    <span>Salah</span>
-                    <strong id="resultWrong">0</strong>
-                </div>
-            </div>
-
-            <button id="restartBtn" class="main-btn">
-                🔄 Main Lagi
-            </button>
-
-        </section>
-
+        <!-- Layar Selesai (End Screen) -->
+        <div id="end-screen" class="overlay-screen hidden">
+            <h1>Petualangan Selesai!</h1>
+            <p>Skor Akhir Anda: <strong id="final-score" class="highlight-score">0</strong></p>
+            <div id="sync-status">Menyimpan skor ke Google Sheets...</div>
+            <button class="btn-primary" style="margin-top:20px;" onclick="location.reload()">Main Lagi</button>
+        </div>
     </div>
 
-    <script src="game.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
