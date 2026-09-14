@@ -3,48 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Edukasi - Kuis Pintar</title>
-    <!-- Menghubungkan file CSS terpisah -->
+    <title>EduQuest - Game Edukasi</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
     <div class="game-container">
-        <!-- Tampilan Pendaftaran Nama -->
-        <div id="screen-login">
-            <h1>🎮 Kuis Edukasi Interaktif</h1>
-            <p>Masukkan nama kamu untuk mulai bermain:</p>
-            <input type="text" id="player-name" placeholder="Nama Lengkap...">
-            <br>
-            <button onclick="mulaiGame()">Mulai Bermain</button>
-        </div>
 
-        <!-- Tampilan Loading -->
-        <div id="screen-loading" class="hidden">
-            <h2>Memuat Soal dari Google Sheets...</h2>
-            <p>Mohon tunggu sebentar ⏳</p>
-        </div>
+        <!-- START SCREEN -->
+        <section id="startScreen" class="screen active">
+            <div class="logo">🎓</div>
+            <h1>Edu<span>Quest</span></h1>
+            <p>Petualangan belajar yang menyenangkan!</p>
 
-        <!-- Tampilan Soal Kuis -->
-        <div id="screen-quiz" class="hidden">
-            <h3 id="question-counter">Soal 1 dari 5</h3>
-            <p id="question-text">Pertanyaan akan muncul di sini</p>
-            <div id="options-container">
-                <!-- Tombol pilihan ganda akan digenerate otomatis lewat JS -->
+            <input
+                type="text"
+                id="playerName"
+                placeholder="Masukkan nama kamu..."
+                maxlength="20"
+            >
+
+            <button id="startBtn" class="main-btn">
+                🚀 Mulai Bermain
+            </button>
+        </section>
+
+        <!-- GAME SCREEN -->
+        <section id="gameScreen" class="screen">
+
+            <div class="top-bar">
+                <div class="stat">
+                    ❤️ <span id="lives">3</span>
+                </div>
+
+                <div class="stat">
+                    ⭐ <span id="score">0</span>
+                </div>
+
+                <div class="stat">
+                    🏆 Level <span id="level">1</span>
+                </div>
+
+                <div class="stat">
+                    ⏱️ <span id="timer">15</span>
+                </div>
             </div>
-        </div>
 
-        <!-- Tampilan Selesai -->
-        <div id="screen-result" class="hidden">
-            <h1>🎉 Permainan Selesai!</h1>
-            <p>Skor Kamu:</p>
-            <p id="score-board">0</p>
-            <p id="sync-status" style="color: gray; font-size: 14px;"></p>
-            <button onclick="location.reload()">Main Lagi</button>
-        </div>
+            <div class="progress-container">
+                <div id="progressBar"></div>
+            </div>
+
+            <div class="question-card">
+
+                <div class="question-number">
+                    Pertanyaan <span id="questionNumber">1</span>
+                </div>
+
+                <h2 id="question">
+                    Loading...
+                </h2>
+
+                <div id="answers" class="answers"></div>
+
+                <div id="feedback" class="feedback"></div>
+
+                <button id="nextBtn" class="next-btn hidden">
+                    Pertanyaan Berikutnya →
+                </button>
+
+            </div>
+
+        </section>
+
+        <!-- RESULT SCREEN -->
+        <section id="resultScreen" class="screen">
+
+            <div class="result-icon">🏆</div>
+
+            <h1>Permainan Selesai!</h1>
+
+            <p id="resultMessage"></p>
+
+            <div class="result-card">
+                <div>
+                    <span>Nama</span>
+                    <strong id="resultName">-</strong>
+                </div>
+
+                <div>
+                    <span>Skor</span>
+                    <strong id="resultScore">0</strong>
+                </div>
+
+                <div>
+                    <span>Benar</span>
+                    <strong id="resultCorrect">0</strong>
+                </div>
+
+                <div>
+                    <span>Salah</span>
+                    <strong id="resultWrong">0</strong>
+                </div>
+            </div>
+
+            <button id="restartBtn" class="main-btn">
+                🔄 Main Lagi
+            </button>
+
+        </section>
+
     </div>
 
-    <!-- Menghubungkan file JavaScript terpisah -->
-    <script src="script.js"></script>
+    <script src="game.js"></script>
 </body>
 </html>
