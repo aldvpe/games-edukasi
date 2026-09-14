@@ -1,336 +1,219 @@
-const URL_GOOGLE_SCRIPT =
-    "MASUKKAN_URL_GOOGLE_APPS_SCRIPT_DI_SINI";
+// URL Web App Google Apps Script Anda
+const GOOGLE_SHEETS_URL = "URL_WEB_APP_GOOGLE_SHEETS_ANDA";
 
+let questions = [];
+let currentQuestion = null;
+let score = 0;
+let lives = 3;
 
-let soal = [];
-let soalSekarang = 0;
-let skor = 0;
-let namaPemain = "";
+// Canvas Setup
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+canvas.width = 800;
+canvas.height = 500;
 
+// Game State & Entities
+const player = {
+  x: 50,
+  y: 380,
+  width: 40,
+  height: 40,
+  color: "#38bdf8",
+  speed: 5,
+  dy: 0,
+  isJumping: false
+};
 
-// ===============================
-// MULAI GAME
-// ===============================
+const chests = [
+  { x: 250, y: 380, size: 40, active: true },
+  { x: 500, y: 380, size: 40, active: true },
+  { x: 700, y: 380, size: 40, active: true }
+];
 
-async function mulaiGame() {
+const gravity = 0.5;
+const keys = {};
 
-    const inputNama =
-        document.getElementById("nama");
+// Input Handlers
+window.addEventListener("keydown", (e) => keys[e.code] = true);
+window.addEventListener("keyup", (e) => keys[e.code] = false);
 
-    namaPemain =
-        inputNama.value.trim();
-
-    if (!namaPemain) {
-
-        alert("Masukkan nama terlebih dahulu!");
-
-        return;
-    }
-
-
-    document
-        .getElementById("startScreen")
-        .classList.add("hidden");
-
-    document
-        .getElementById("quizScreen")
-        .classList.remove("hidden");
-
-
-    await ambilSoal();
+// Fetch Data Soal dari Google Sheets API
+async function loadQuestions() {
+  try {
+    const res = await fetch(GOOGLE_SHEETS_URL);
+    questions = await res.json();
+    console.log("Soal berhasil dimuat dari Google Sheets:", questions);
+  } catch (err) {
+    console.warn("Gagal terhubung ke Google Sheets API. Menggunakan soal cadangan/fallback.", err);
+    // Soal fallback jika API belum dikonfigurasi
+    questions = [
+      {
+        Kategori: "Matematika",
+        Tipe: "pilihan_ganda",
+        Pertanyaan: "Berapakah hasil dari 15 + 27?",
+        OpsiA: "40",
+        OpsiB: "42",
+        OpsiC: "44",
+        OpsiD: "46",
+        JawabanBenar: "B"
+      },
+      {
+        Kategori: "Sains",
+        Tipe: "pilihan_ganda",
+        Pertanyaan: "Planet terdekat dari Matahari adalah?",
+        OpsiA: "Venus",
+        OpsiB: "Mars",
+        OpsiC: "Merkurius",
+        OpsiD: "Bumi",
+        JawabanBenar: "C"
+      },
+      {
+        Kategori: "Bahasa",
+        Tipe: "pilihan_ganda",
+        Pertanyaan: "Sinonim dari kata 'Pintar' adalah?",
+        OpsiA: "Pandai",
+        OpsiB: "Malas",
+        OpsiC: "Lambat",
+        OpsiD: "Gagal",
+        JawabanBenar: "A"
+      }
+    ];
+  }
 }
 
+// Game Logic Update
+function update() {
+  // Movement
+  if (keys["ArrowRight"] || keys["KeyD"]) player.x += player.speed;
+  if (keys["ArrowLeft"] || keys["KeyA"]) player.x -= player.speed;
 
-// ===============================
-// AMBIL SOAL DARI GOOGLE SHEETS
-// ===============================
+  // Jump
+  if ((keys["Space"] || keys["ArrowUp"]) && !player.isJumping) {
+    player.dy = -10;
+    player.isJumping = true;
+  }
 
-async function ambilSoal() {
+  // Gravity & Physics
+  player.dy += gravity;
+  player.y += player.dy;
 
-    try {
+  // Screen Bounds (Player)
+  if (player.x < 0) player.x = 0;
+  if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
 
-        document.getElementById("pertanyaan")
-            .innerText = "Memuat soal...";
+  // Ground Collision
+  if (player.y >= 380) {
+    player.y = 380;
+    player.dy = 0;
+    player.isJumping = false;
+  }
 
-
-        const response =
-            await fetch(URL_GOOGLE_SCRIPT);
-
-
-        soal = await response.json();
-
-
-        if (!soal.length) {
-
-            alert("Soal tidak ditemukan!");
-
-            return;
-        }
-
-
-        // Acak soal
-        soal.sort(() => Math.random() - 0.5);
-
-
-        tampilkanSoal();
-
-    } catch (error) {
-
-        console.error(error);
-
-        alert(
-            "Gagal mengambil soal dari Google Sheets."
-        );
-    }
-}
-
-
-// ===============================
-// TAMPILKAN SOAL
-// ===============================
-
-function tampilkanSoal() {
-
-    const data =
-        soal[soalSekarang];
-
-
-    document.getElementById("nomorSoal")
-        .innerText =
-        `Soal ${soalSekarang + 1} / ${soal.length}`;
-
-
-    document.getElementById("skor")
-        .innerText = skor;
-
-
-    document.getElementById("pertanyaan")
-        .innerText =
-        data.pertanyaan;
-
-
-    document.getElementById("A")
-        .innerText =
-        "A. " + data.pilihanA;
-
-
-    document.getElementById("B")
-        .innerText =
-        "B. " + data.pilihanB;
-
-
-    document.getElementById("C")
-        .innerText =
-        "C. " + data.pilihanC;
-
-
-    document.getElementById("D")
-        .innerText =
-        "D. " + data.pilihanD;
-
-
-    document.getElementById("feedback")
-        .innerText = "";
-
-
-    aktifkanJawaban(true);
-}
-
-
-// ===============================
-// JAWAB SOAL
-// ===============================
-
-function jawab(pilihan) {
-
-    const data =
-        soal[soalSekarang];
-
-
-    aktifkanJawaban(false);
-
-
+  // Collision Detection (Player vs Chests)
+  chests.forEach((chest) => {
     if (
-        pilihan.toUpperCase() ===
-        String(data.jawaban).toUpperCase()
+      chest.active &&
+      Math.abs(player.x - chest.x) < 30 &&
+      Math.abs(player.y - chest.y) < 30
     ) {
-
-        skor += 100;
-
-
-        document.getElementById("feedback")
-            .innerText =
-            "✅ BENAR! +100 poin";
-
-
-        document.getElementById(pilihan)
-            .classList.add("correct");
-
-    } else {
-
-        document.getElementById("feedback")
-            .innerText =
-            "❌ SALAH!";
-
-
-        document.getElementById(pilihan)
-            .classList.add("wrong");
+      chest.active = false;
+      triggerQuiz();
     }
-
-
-    document.getElementById("skor")
-        .innerText = skor;
-
-
-    setTimeout(() => {
-
-        soalSekarang++;
-
-
-        if (
-            soalSekarang >= soal.length
-        ) {
-
-            selesaiGame();
-
-        } else {
-
-            resetTombol();
-
-            tampilkanSoal();
-        }
-
-    }, 1200);
+  });
 }
 
+// Render 2D Canvas
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-// ===============================
-// AKTIFKAN / MATIKAN JAWABAN
-// ===============================
+  // Draw Ground
+  ctx.fillStyle = "#334155";
+  ctx.fillRect(0, 420, canvas.width, 80);
 
-function aktifkanJawaban(status) {
+  // Draw Player
+  ctx.fillStyle = player.color;
+  ctx.fillRect(player.x, player.y, player.width, player.height);
 
-    ["A", "B", "C", "D"].forEach(id => {
-
-        document.getElementById(id)
-            .disabled = !status;
-
-    });
-}
-
-
-// ===============================
-// RESET TOMBOL
-// ===============================
-
-function resetTombol() {
-
-    ["A", "B", "C", "D"].forEach(id => {
-
-        const tombol =
-            document.getElementById(id);
-
-        tombol.classList.remove(
-            "correct",
-            "wrong"
-        );
-
-    });
-}
-
-
-// ===============================
-// GAME SELESAI
-// ===============================
-
-async function selesaiGame() {
-
-    document
-        .getElementById("quizScreen")
-        .classList.add("hidden");
-
-
-    document
-        .getElementById("resultScreen")
-        .classList.remove("hidden");
-
-
-    document.getElementById("hasilNama")
-        .innerText =
-        namaPemain;
-
-
-    document.getElementById("hasilSkor")
-        .innerText =
-        skor;
-
-
-    let pesan = "";
-
-
-    if (skor >= soal.length * 80) {
-
-        pesan =
-            "🌟 Luar biasa! Kamu sangat pintar!";
-
-    } else if (skor >= soal.length * 50) {
-
-        pesan =
-            "👍 Bagus! Terus belajar ya!";
-
-    } else {
-
-        pesan =
-            "💪 Jangan menyerah! Coba lagi!";
-
+  // Draw Interactive Chests
+  chests.forEach((chest) => {
+    if (chest.active) {
+      ctx.fillStyle = "#f59e0b";
+      ctx.fillRect(chest.x, chest.y, chest.size, chest.size);
     }
-
-
-    document.getElementById("hasilPesan")
-        .innerText = pesan;
-
-
-    await simpanSkor();
+  });
 }
 
+// Game Main Loop
+function gameLoop() {
+  update();
+  draw();
+  requestAnimationFrame(gameLoop);
+}
 
-// ===============================
-// SIMPAN SKOR KE GOOGLE SHEETS
-// ===============================
+// Trigger Quiz Dialog
+function triggerQuiz() {
+  if (questions.length === 0) return;
 
-async function simpanSkor() {
+  // Pilih soal secara acak dari array
+  currentQuestion = questions[Math.floor(Math.random() * questions.length)];
 
-    try {
+  document.getElementById("quiz-category").innerText = currentQuestion.Kategori || "UMUM";
+  document.getElementById("quiz-question").innerText = currentQuestion.Pertanyaan;
 
-        await fetch(
-            URL_GOOGLE_SCRIPT,
-            {
-                method: "POST",
+  const container = document.getElementById("options-container");
+  container.innerHTML = "";
 
-                headers: {
-                    "Content-Type":
-                        "text/plain;charset=utf-8"
-                },
+  const options = [
+    { key: "A", text: currentQuestion.OpsiA },
+    { key: "B", text: currentQuestion.OpsiB },
+    { key: "C", text: currentQuestion.OpsiC },
+    { key: "D", text: currentQuestion.OpsiD }
+  ];
 
-                body: JSON.stringify({
-
-                    nama: namaPemain,
-
-                    skor: skor
-
-                })
-            }
-        );
-
-        console.log(
-            "Skor berhasil disimpan."
-        );
-
-    } catch (error) {
-
-        console.error(
-            "Gagal menyimpan skor:",
-            error
-        );
+  options.forEach((opt) => {
+    if (opt.text) {
+      const btn = document.createElement("button");
+      btn.className = "btn-option";
+      btn.innerText = `${opt.key}. ${opt.text}`;
+      btn.onclick = () => checkAnswer(opt.key);
+      container.appendChild(btn);
     }
+  });
+
+  document.getElementById("quiz-modal").style.display = "flex";
 }
+
+// Check Answer Logic
+function checkAnswer(selectedKey) {
+  document.getElementById("quiz-modal").style.display = "none";
+
+  if (selectedKey === currentQuestion.JawabanBenar) {
+    score += 10;
+    document.getElementById("score").innerText = score;
+    alert("✨ BENAR! +10 Poin");
+  } else {
+    lives--;
+    document.getElementById("lives").innerText = "❤️".repeat(Math.max(0, lives));
+    alert(`❌ SALAH! Jawaban yang benar adalah (${currentQuestion.JawabanBenar})`);
+
+    if (lives <= 0) {
+      alert("Game Over! Skor akhir Anda: " + score);
+      resetGame();
+    }
+  }
+}
+
+// Reset Game State
+function resetGame() {
+  score = 0;
+  lives = 3;
+  player.x = 50;
+  player.y = 380;
+  chests.forEach((chest) => (chest.active = true));
+  document.getElementById("score").innerText = score;
+  document.getElementById("lives").innerText = "❤️❤️❤️";
+}
+
+// Start Game
+loadQuestions().then(() => {
+  gameLoop();
+});
