@@ -4,225 +4,110 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Petualangan Kuis - Game Edukasi</title>
+    <title>EduGame 2D</title>
 
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <div class="container">
+<div class="game">
 
-        <!-- HEADER -->
-        <header>
-            <h1>🎮 Petualangan Kuis</h1>
-            <p>Game Edukasi 2D</p>
-        </header>
+    <div id="startScreen" class="screen">
+        <h1>🎮 EDU GAME</h1>
 
+        <p>
+            Uji pengetahuanmu dan dapatkan skor tertinggi!
+        </p>
 
-        <!-- LOGIN SCREEN -->
-        <section id="loginScreen" class="screen">
+        <input
+            type="text"
+            id="nama"
+            placeholder="Masukkan nama kamu"
+        >
 
-            <div class="welcome">
-                <div class="game-icon">🎓</div>
+        <button onclick="mulaiGame()">
+            MULAI GAME
+        </button>
+    </div>
 
-                <h2>Selamat Datang!</h2>
 
-                <p>
-                    Masukkan nama kamu untuk memulai permainan.
-                </p>
+    <div id="quizScreen" class="screen hidden">
 
-                <input
-                    type="text"
-                    id="playerName"
-                    placeholder="Masukkan nama..."
-                    maxlength="30"
-                >
+        <div class="topbar">
+            <span id="nomorSoal">
+                Soal 1
+            </span>
 
-                <button id="startButton">
-                    🚀 Mulai Game
-                </button>
-            </div>
+            <span>
+                Skor: <b id="skor">0</b>
+            </span>
+        </div>
 
-        </section>
+        <div class="character">
+            🧑‍🎓
+        </div>
 
+        <div class="question-box">
+            <h2 id="pertanyaan">
+                Memuat soal...
+            </h2>
+        </div>
 
-        <!-- GAME SCREEN -->
-        <section id="gameScreen" class="screen hidden">
+        <div class="answers">
 
-            <!-- STATUS -->
-            <div class="info">
+            <button onclick="jawab('A')" id="A">
+                A. -
+            </button>
 
-                <div>
-                    👤
-                    <span id="displayName">Pemain</span>
-                </div>
+            <button onclick="jawab('B')" id="B">
+                B. -
+            </button>
 
-                <div>
-                    ⭐ Skor:
-                    <span id="score">0</span>
-                </div>
+            <button onclick="jawab('C')" id="C">
+                C. -
+            </button>
 
-                <div>
-                    ❤️ Nyawa:
-                    <span id="lives">3</span>
-                </div>
+            <button onclick="jawab('D')" id="D">
+                D. -
+            </button>
 
-            </div>
+        </div>
 
-
-            <!-- GAME AREA -->
-            <div id="gameArea">
-
-                <!-- CLOUDS -->
-                <div class="cloud cloud1"></div>
-                <div class="cloud cloud2"></div>
-                <div class="cloud cloud3"></div>
-
-
-                <!-- SUN -->
-                <div class="sun">☀️</div>
-
-
-                <!-- PLAYER -->
-                <div id="player">
-                    🙂
-                </div>
-
-
-                <!-- TREASURE -->
-                <div id="treasure">
-                    💎
-                </div>
-
-
-                <!-- GROUND -->
-                <div class="ground"></div>
-
-
-                <!-- QUESTION BOX -->
-                <div id="questionBox" class="question-box hidden">
-
-                    <div class="question-header">
-                        <span>❓ Pertanyaan</span>
-
-                        <span id="questionNumber">
-                            1 / 8
-                        </span>
-                    </div>
-
-                    <h2 id="question">
-                        Pertanyaan
-                    </h2>
-
-                    <div
-                        id="answers"
-                        class="answers">
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- CONTROLS -->
-            <div class="controls">
-
-                <p>
-                    Gunakan keyboard atau tombol di bawah
-                    untuk bergerak.
-                </p>
-
-                <div class="control-buttons">
-
-                    <button id="leftButton">
-                        ◀ Kiri
-                    </button>
-
-                    <button id="rightButton">
-                        Kanan ▶
-                    </button>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- RESULT SCREEN -->
-        <section id="resultScreen" class="screen hidden">
-
-            <div class="result">
-
-                <div class="result-icon">
-                    🏆
-                </div>
-
-                <h2>🎉 Permainan Selesai!</h2>
-
-                <p>
-                    Selamat,
-                    <strong id="resultName">
-                        Pemain
-                    </strong>!
-                </p>
-
-                <div class="score">
-                    <span id="finalScore">0</span>
-                </div>
-
-                <p class="score-label">
-                    TOTAL SKOR
-                </p>
-
-
-                <div class="result-stats">
-
-                    <div class="stat correct">
-                        <span>✅</span>
-                        <strong id="finalCorrect">
-                            0
-                        </strong>
-                        <small>Benar</small>
-                    </div>
-
-                    <div class="stat wrong">
-                        <span>❌</span>
-                        <strong id="finalWrong">
-                            0
-                        </strong>
-                        <small>Salah</small>
-                    </div>
-
-                    <div class="stat time">
-                        <span>⏱️</span>
-                        <strong id="finalTime">
-                            0
-                        </strong>
-                        <small>Waktu</small>
-                    </div>
-
-                </div>
-
-
-                <p id="saveStatus" class="save-status">
-                    Menyimpan hasil...
-                </p>
-
-
-                <button id="restartButton">
-                    🔄 Main Lagi
-                </button>
-
-            </div>
-
-        </section>
+        <p id="feedback"></p>
 
     </div>
 
 
-    <script src="script.js"></script>
+    <div id="resultScreen" class="screen hidden">
+
+        <h1>🎉 SELESAI!</h1>
+
+        <div class="result-character">
+            🏆
+        </div>
+
+        <h2 id="hasilNama"></h2>
+
+        <p>
+            Skor kamu:
+        </p>
+
+        <div class="final-score" id="hasilSkor">
+            0
+        </div>
+
+        <p id="hasilPesan"></p>
+
+        <button onclick="location.reload()">
+            MAIN LAGI
+        </button>
+
+    </div>
+
+</div>
+
+<script src="game.js"></script>
 
 </body>
 </html>
